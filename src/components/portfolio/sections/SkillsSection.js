@@ -1,4 +1,5 @@
 import SectionHeader from "@/components/portfolio/SectionHeader";
+import SkillChip from "@/components/portfolio/SkillChip";
 import {
   getVisibleSkillsGroups,
   normalizeSkillsContent,
@@ -13,23 +14,18 @@ export default function SkillsSection({ content }) {
   return (
     <section className="space-y-5 scroll-mt-[30px]" id="skills">
       <SectionHeader>{title}</SectionHeader>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
         {groups.map((group) => (
           <div
             key={group.id}
-            className="p-4 bg-surface-container border border-border rounded-xl"
+            className="rounded-lg border border-border bg-surface-container p-4"
           >
-            <p className="text-[10px] text-primary uppercase mb-3 tracking-tighter">
+            <p className="mb-3 text-[10px] uppercase tracking-tighter text-primary">
               {group.title}
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2.5">
               {group.items.map((item) => (
-                <span
-                  key={`${group.id}-${item}`}
-                  className="px-2 py-1 bg-surface-container-highest rounded text-[11px] text-on-surface"
-                >
-                  {item}
-                </span>
+                <SkillChip key={`${group.id}-${item}`}>{item}</SkillChip>
               ))}
             </div>
           </div>

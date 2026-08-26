@@ -236,7 +236,7 @@ export default function ContactTerminal({ onCollapse, content }) {
           <button
             type="submit"
             disabled={pending}
-            className="terminal-submit flex w-full items-center justify-center rounded-md border border-primary/25 bg-primary/90 px-3 py-2 text-[13px] font-semibold text-on-primary shadow-[inset_0_1px_0_rgb(255_255_255/0.12)] transition-all hover:bg-primary hover:brightness-110 active:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+            className="terminal-submit portfolio-btn portfolio-btn--ghost flex w-full items-center justify-center border border-border bg-surface-container-low px-3 py-2 text-[13px] font-semibold text-on-surface disabled:cursor-not-allowed disabled:opacity-60"
           >
             {pending ? "Sending…" : "Send Message"}
           </button>

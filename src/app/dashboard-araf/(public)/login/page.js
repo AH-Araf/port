@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { loginAction } from "@/app/dashboard-araf/actions";
+import DashboardAuthAtmosphere from "@/components/dashboard/DashboardAuthAtmosphere";
 import PasswordField from "@/components/dashboard/PasswordField";
 
 const initialState = { error: null };
@@ -15,23 +16,7 @@ export default function DashboardLoginPage() {
 
   return (
     <main className="relative flex h-full min-h-0 items-center justify-center overflow-hidden px-4 py-10">
-      <div
-        className="pointer-events-none absolute inset-0"
-        aria-hidden
-        style={{
-          background:
-            "radial-gradient(ellipse 70% 55% at 50% -15%, rgb(173 198 255 / 0.18), transparent 55%), radial-gradient(ellipse 50% 40% at 90% 90%, rgb(78 222 163 / 0.08), transparent 50%), radial-gradient(ellipse 40% 35% at 10% 80%, rgb(173 198 255 / 0.06), transparent 45%)",
-        }}
-      />
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.035]"
-        aria-hidden
-        style={{
-          backgroundImage:
-            "linear-gradient(rgb(227 226 232) 1px, transparent 1px), linear-gradient(90deg, rgb(227 226 232) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-        }}
-      />
+      <DashboardAuthAtmosphere />
 
       <div className="relative z-[1] w-full max-w-[420px]">
         <div className="mb-5 flex items-center gap-3">
@@ -48,7 +33,7 @@ export default function DashboardLoginPage() {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-border bg-surface-container-lowest/95 shadow-[0_24px_80px_rgb(0_0_0/0.45)]">
+        <div className="overflow-hidden rounded-xl border border-border bg-surface-container-lowest/95 shadow-[0_24px_80px_rgb(0_0_0/0.45)] backdrop-blur-[2px]">
           <div className="flex h-9 items-center gap-1.5 border-b border-border bg-surface-container-low/80 px-3">
             <span className="h-2.5 w-2.5 rounded-full bg-error/70" />
             <span className="h-2.5 w-2.5 rounded-full bg-tertiary/70" />

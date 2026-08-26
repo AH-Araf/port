@@ -112,6 +112,13 @@ export function buildAiKnowledgePayload({
   if (vis.secondaryCta !== false && a.cvUrl) {
     aboutOut.cvUrl = String(a.cvUrl);
   }
+  if (vis.map !== false && a.location && typeof a.location === "object") {
+    const city = String(a.location.city ?? "").trim();
+    const country = String(a.location.country ?? "").trim();
+    if (city || country) {
+      aboutOut.location = [city, country].filter(Boolean).join(", ");
+    }
+  }
 
   return stripExcludedAiKnowledgeKeys({
     security: { ...AI_SECURITY_BLOCK },
@@ -120,7 +127,7 @@ export function buildAiKnowledgePayload({
     about: aboutOut,
     experience: asSection(experience, "Experience"),
     skills: asSection(skills, "Tech Stack", "groups"),
-    projects: asSection(projects, "Selected Projects"),
+    projects: asSection(projects, "Projects"),
     education: asSection(education, "Education"),
     awards: asSection(awards, "Awards"),
     publication: asSection(publication, "Publication"),

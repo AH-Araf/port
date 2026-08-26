@@ -40,7 +40,7 @@ function createSectionRenderers(content, onNavigateSection) {
   return {
     about: (searchHighlight) => (
       <SectionSearchTarget sectionHref="#about" searchHighlight={searchHighlight}>
-        <div id="about" className="space-y-14 scroll-mt-[30px]">
+        <div id="about" className="space-y-8 scroll-mt-[30px]">
           <HeroSection content={aboutContent} onNavigateSection={onNavigateSection} />
           <AboutSection content={aboutContent} />
         </div>

@@ -111,11 +111,14 @@ function LivePreview({ state }) {
   const panel = palette[2] ?? palette[0];
   const fontKey = state.activeTypography ? state.fontPack : "inter";
   const font = FONT_SAMPLE[fontKey] ?? FONT_SAMPLE.inter;
-  const terminalOpt = state.activeTerminalTheme
-    ? TERMINAL_THEME_OPTIONS.find((o) => o.value === state.terminalTheme)
+  const chatOn = Boolean(state.activeChatTheme);
+  const terminalOn = Boolean(state.activeTerminalTheme);
+  const terminalOpt = terminalOn
+    ? TERMINAL_THEME_OPTIONS.find((o) => o.value === state.terminalTheme) ??
+      TERMINAL_THEME_OPTIONS[0]
     : null;
-  const chatOpt = state.activeChatTheme
-    ? CHAT_THEME_OPTIONS.find((o) => o.value === state.chatTheme)
+  const chatOpt = chatOn
+    ? CHAT_THEME_OPTIONS.find((o) => o.value === state.chatTheme) ?? CHAT_THEME_OPTIONS[0]
     : null;
   const live = state.activeThemeSource === "live-animation";
   const macWallpaper = getMacWallpaper(state);
@@ -123,6 +126,8 @@ function LivePreview({ state }) {
   const terminalSkin = terminalOpt?.value || "";
   const chatSkin = chatOpt?.value || "";
   const terminalLive = TERMINAL_LIVE_SKINS.has(terminalSkin) ? terminalSkin : "";
+  const chromePanel = glass ? "rgba(28,28,30,0.55)" : panel;
+  const chromeBorder = `${accent}22`;
 
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface-container-lowest">
@@ -143,16 +148,13 @@ function LivePreview({ state }) {
               {font.label}
             </span>
           ) : null}
-          {terminalOpt ? (
-            <span className="rounded bg-surface-container-high px-1.5 py-0.5 font-label-mono text-[9px] text-on-surface-variant">
-              Term{terminalOpt.kind === "live" ? " · live" : ""}
-            </span>
-          ) : null}
-          {chatOpt ? (
-            <span className="rounded bg-surface-container-high px-1.5 py-0.5 font-label-mono text-[9px] text-on-surface-variant">
-              Chat{CHAT_LIVE_SKINS.has(chatSkin) ? " · live" : ""}
-            </span>
-          ) : null}
+          <span className="rounded bg-surface-container-high px-1.5 py-0.5 font-label-mono text-[9px] text-on-surface-variant">
+            Term{terminalOpt?.kind === "live" ? " · live" : terminalOn ? "" : " · theme"}
+          </span>
+          <span className="rounded bg-surface-container-high px-1.5 py-0.5 font-label-mono text-[9px] text-on-surface-variant">
+            Chat
+            {CHAT_LIVE_SKINS.has(chatSkin) ? " · live" : chatOn ? "" : " · theme"}
+          </span>
         </div>
       </div>
       <div className="p-3">
@@ -189,8 +191,8 @@ function LivePreview({ state }) {
             <div
               className="hidden w-14 shrink-0 border-r p-1.5 sm:block"
               style={{
-                background: glass ? "rgba(28,28,30,0.55)" : panel,
-                borderColor: `${accent}22`,
+                background: chromePanel,
+                borderColor: chromeBorder,
                 backdropFilter: glass ? "blur(8px)" : undefined,
               }}
             >
@@ -221,10 +223,9 @@ function LivePreview({ state }) {
               </div>
             </div>
 
-            {/* Real chat-panel skin classes so CSS + live layers apply */}
-            {chatOpt ? (
+            {chatOn ? (
               <div
-                className="chat-panel relative hidden w-[116px] shrink-0 overflow-hidden border-l md:block"
+                className="chat-panel relative w-[116px] shrink-0 overflow-hidden border-l"
                 data-chat-skin={chatSkin}
               >
                 <div className="chat-live-layer pointer-events-none absolute inset-0" aria-hidden />
@@ -241,20 +242,34 @@ function LivePreview({ state }) {
               </div>
             ) : (
               <div
-                className="hidden w-16 shrink-0 border-l p-1.5 md:block"
+                className="relative flex w-[116px] shrink-0 flex-col overflow-hidden border-l p-2"
                 style={{
-                  background: glass ? "rgba(28,28,30,0.55)" : panel,
-                  borderColor: `${accent}22`,
+                  background: chromePanel,
+                  borderColor: chromeBorder,
+                  backdropFilter: glass ? "blur(8px)" : undefined,
                 }}
               >
-                <div className="mb-1.5 h-1.5 w-10 rounded" style={{ background: `${accent}55` }} />
-                <div className="h-6 rounded bg-white/5" />
+                <p className="text-[9px] font-semibold" style={{ color: accent }}>
+                  AI Chat
+                </p>
+                <p className="mt-1 text-[8px] leading-snug text-white/45">Workspace theme</p>
+                <div
+                  className="mt-auto rounded border px-1.5 py-1 text-[8px] text-white/40"
+                  style={{ borderColor: chromeBorder, background: `${bg}88` }}
+                >
+                  Ask anything…
+                </div>
+                <div
+                  className="mt-1.5 flex h-5 items-center justify-center rounded text-[8px] font-semibold"
+                  style={{ background: accent, color: bg }}
+                >
+                  Send
+                </div>
               </div>
             )}
           </div>
 
-          {/* Real contact-terminal skin + live canvas */}
-          {terminalOpt ? (
+          {terminalOn ? (
             <div
               className="contact-terminal relative z-[1] overflow-hidden border-t"
               data-terminal-skin={terminalSkin}
@@ -284,7 +299,46 @@ function LivePreview({ state }) {
                 </div>
               </div>
             </div>
-          ) : null}
+          ) : (
+            <div
+              className="relative z-[1] overflow-hidden border-t"
+              style={{ background: chromePanel, borderColor: chromeBorder }}
+            >
+              <div
+                className="relative z-[1] flex h-7 items-center gap-1.5 border-b px-2.5"
+                style={{ borderColor: chromeBorder }}
+              >
+                <span
+                  className="material-symbols-outlined !text-[12px]"
+                  style={{ color: accent }}
+                >
+                  terminal
+                </span>
+                <span className="truncate text-[9px] font-semibold text-white/90">
+                  Let&apos;s Connect
+                </span>
+                <span className="ml-auto truncate text-[8px] text-white/45">Workspace theme</span>
+              </div>
+              <div className="relative z-[1] space-y-1.5 px-2.5 py-2 font-label-mono">
+                <p className="flex items-center gap-1 text-[9px]">
+                  <span style={{ color: accent }}>➜</span>
+                  <span className="text-white/45">~/connect</span>
+                  <span className="text-white/30">$</span>
+                  <span className="text-white/90">hello</span>
+                  <span
+                    className="ml-0.5 inline-block h-2.5 w-1 animate-pulse"
+                    style={{ background: accent }}
+                  />
+                </p>
+                <div
+                  className="rounded border px-1.5 py-1 text-[8px] text-white/35"
+                  style={{ borderColor: chromeBorder, background: `${bg}88` }}
+                >
+                  your message…
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
