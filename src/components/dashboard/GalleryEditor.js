@@ -4,6 +4,7 @@ import { useActionState, useEffect, useState } from "react";
 import { saveGalleryContentAction } from "@/app/dashboard-araf/galleryActions";
 import { ConfirmModal, StatusModal } from "@/components/dashboard/Modal";
 import ItemActionsMenu from "@/components/dashboard/ItemActionsMenu";
+import GalleryCompareCard from "@/components/portfolio/GalleryCompareCard";
 import {
   createEmptyGalleryItem,
   normalizeGalleryContent,
@@ -68,7 +69,7 @@ export default function GalleryEditor({ initialContent }) {
   const requestRemoveItem = (item, index) => {
     setPendingRemove({
       id: item.id,
-      label: item.caption || `Gallery ${index + 1}`,
+      label: item.title || `Gallery ${index + 1}`,
     });
   };
 
@@ -151,11 +152,11 @@ export default function GalleryEditor({ initialContent }) {
                   photo_library
                 </span>
                 <h2 className="truncate text-[15px] font-medium text-on-surface">
-                  {item.caption || `Gallery ${index + 1}`}
+                  {item.title || `Gallery ${index + 1}`}
                 </h2>
               </div>
               <ItemActionsMenu
-                label={item.caption || `Gallery ${index + 1}`}
+                label={item.title || `Gallery ${index + 1}`}
                 visible={item.visible !== false}
                 onToggleVisible={(next) => updateItem(item.id, { visible: next })}
                 onDelete={() => requestRemoveItem(item, index)}
@@ -167,63 +168,125 @@ export default function GalleryEditor({ initialContent }) {
             </div>
 
             <div>
-              <label className={labelClass} htmlFor={`caption-${item.id}`}>
-                Caption
+              <label className={labelClass} htmlFor={`title-${item.id}`}>
+                Title
               </label>
               <input
-                id={`caption-${item.id}`}
-                value={item.caption}
-                onChange={(e) => updateItem(item.id, { caption: e.target.value })}
+                id={`title-${item.id}`}
+                value={item.title}
+                onChange={(e) => updateItem(item.id, { title: e.target.value })}
                 className={fieldClass}
                 placeholder="DevFest Keynote"
                 required
               />
             </div>
 
-            <div>
-              <label className={labelClass} htmlFor={`imageUrl-${item.id}`}>
-                Image URL
-              </label>
-              <input
-                id={`imageUrl-${item.id}`}
-                value={item.imageUrl}
-                onChange={(e) => updateItem(item.id, { imageUrl: e.target.value })}
-                className={fieldClass}
-                placeholder="https://…"
-              />
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(240px,320px)] lg:items-start">
+              <div className="space-y-4 min-w-0">
+                <div>
+                  <label className={labelClass} htmlFor={`subtitle-${item.id}`}>
+                    Subtitle
+                  </label>
+                  <input
+                    id={`subtitle-${item.id}`}
+                    value={item.subtitle}
+                    onChange={(e) =>
+                      updateItem(item.id, { subtitle: e.target.value })
+                    }
+                    className={fieldClass}
+                    placeholder="Google Developer Groups"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    className={labelClass}
+                    htmlFor={`description-${item.id}`}
+                  >
+                    Short description
+                  </label>
+                  <textarea
+                    id={`description-${item.id}`}
+                    rows={2}
+                    value={item.description}
+                    onChange={(e) =>
+                      updateItem(item.id, { description: e.target.value })
+                    }
+                    className={`${fieldClass} h-[64px] max-h-[64px] resize-none`}
+                    placeholder="One or two sentences about this moment…"
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass} htmlFor={`imageUrl-${item.id}`}>
+                    Image URL
+                  </label>
+                  <input
+                    id={`imageUrl-${item.id}`}
+                    value={item.imageUrl}
+                    onChange={(e) =>
+                      updateItem(item.id, { imageUrl: e.target.value })
+                    }
+                    className={fieldClass}
+                    placeholder="https://…"
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass} htmlFor={`imageAlt-${item.id}`}>
+                    Image alt text
+                  </label>
+                  <input
+                    id={`imageAlt-${item.id}`}
+                    value={item.imageAlt}
+                    onChange={(e) =>
+                      updateItem(item.id, { imageAlt: e.target.value })
+                    }
+                    className={fieldClass}
+                    placeholder="Describe the image"
+                  />
+                </div>
+
+                <label className="inline-flex cursor-pointer items-center gap-2 text-[12px] text-on-surface-variant">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(item.wide)}
+                    onChange={(e) =>
+                      updateItem(item.id, { wide: e.target.checked })
+                    }
+                    className="h-4 w-4 rounded border-border"
+                  />
+                  Wide layout
+                </label>
+
+                <p className="text-[11px] text-on-surface-variant/70">
+                  Portfolio: image shows first; drag the slider left to reveal
+                  title, subtitle, and description.
+                </p>
+              </div>
+
+              <div className="flex justify-center lg:sticky lg:top-4 lg:justify-end">
+                <div
+                  className={`w-full shrink-0 ${
+                    item.wide ? "max-w-[320px]" : "max-w-[280px]"
+                  }`}
+                >
+                  {item.imageUrl ? (
+                    <GalleryCompareCard item={item} />
+                  ) : (
+                    <div
+                      className={`flex w-full items-center justify-center rounded-xl border border-dashed border-border bg-surface-container/50 ${
+                        item.wide ? "h-44 md:h-52" : "h-36 md:h-44"
+                      }`}
+                    >
+                      <span className="text-[12px] text-on-surface-variant/60">
+                        Frontend preview
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-
-            <div>
-              <label className={labelClass} htmlFor={`imageAlt-${item.id}`}>
-                Image alt text
-              </label>
-              <input
-                id={`imageAlt-${item.id}`}
-                value={item.imageAlt}
-                onChange={(e) => updateItem(item.id, { imageAlt: e.target.value })}
-                className={fieldClass}
-                placeholder="Describe the image"
-              />
-            </div>
-
-            <label className="inline-flex cursor-pointer items-center gap-2 text-[12px] text-on-surface-variant">
-              <input
-                type="checkbox"
-                checked={Boolean(item.wide)}
-                onChange={(e) => updateItem(item.id, { wide: e.target.checked })}
-                className="h-4 w-4 rounded border-border"
-              />
-              Wide layout
-            </label>
-
-            {item.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={item.imageUrl}
-                alt={item.imageAlt || item.caption || ""}
-                className="h-28 w-full rounded-lg object-cover bg-surface-container"
-              />
-            ) : null}
           </section>
         ))}
 

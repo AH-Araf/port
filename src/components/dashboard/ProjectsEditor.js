@@ -132,7 +132,7 @@ export default function ProjectsEditor({ initialContent }) {
                 setContent((prev) => ({ ...prev, title: e.target.value }))
               }
               className={fieldClass}
-              placeholder="Selected Projects"
+              placeholder="Projects"
               required
             />
           </div>
@@ -205,90 +205,104 @@ export default function ProjectsEditor({ initialContent }) {
                 onChange={(e) =>
                   updateItem(item.id, { description: e.target.value })
                 }
-                className={`${fieldClass} min-h-[80px] resize-y`}
+                className={`${fieldClass} h-[80px] max-h-[80px] resize-none`}
                 placeholder="Short project summary…"
               />
             </div>
 
-            <div>
-              <label className={labelClass} htmlFor={`tags-${item.id}`}>
-                Tags (one per line)
-              </label>
-              <textarea
-                id={`tags-${item.id}`}
-                rows={3}
-                value={item.tags.join("\n")}
-                onChange={(e) =>
-                  updateItem(item.id, { tags: e.target.value.split("\n") })
-                }
-                className={`${fieldClass} min-h-[72px] resize-y`}
-                placeholder={"React\nNext.js"}
-              />
-            </div>
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
+              <div className="space-y-4 min-w-0">
+                <div>
+                  <label className={labelClass} htmlFor={`tags-${item.id}`}>
+                    Tags (one per line)
+                  </label>
+                  <textarea
+                    id={`tags-${item.id}`}
+                    rows={3}
+                    value={item.tags.join("\n")}
+                    onChange={(e) =>
+                      updateItem(item.id, { tags: e.target.value.split("\n") })
+                    }
+                    className={`${fieldClass} h-[72px] max-h-[72px] resize-none`}
+                    placeholder={"React\nNext.js"}
+                  />
+                </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <label className={labelClass} htmlFor={`liveUrl-${item.id}`}>
-                  Live URL (optional)
-                </label>
-                <input
-                  id={`liveUrl-${item.id}`}
-                  type="url"
-                  value={item.liveUrl}
-                  onChange={(e) => updateItem(item.id, { liveUrl: e.target.value })}
-                  className={fieldClass}
-                  placeholder="https://…"
-                />
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <label className={labelClass} htmlFor={`liveUrl-${item.id}`}>
+                      Live URL (optional)
+                    </label>
+                    <input
+                      id={`liveUrl-${item.id}`}
+                      type="url"
+                      value={item.liveUrl}
+                      onChange={(e) => updateItem(item.id, { liveUrl: e.target.value })}
+                      className={fieldClass}
+                      placeholder="https://…"
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass} htmlFor={`codeUrl-${item.id}`}>
+                      Code URL (optional)
+                    </label>
+                    <input
+                      id={`codeUrl-${item.id}`}
+                      type="url"
+                      value={item.codeUrl}
+                      onChange={(e) => updateItem(item.id, { codeUrl: e.target.value })}
+                      className={fieldClass}
+                      placeholder="https://github.com/…"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelClass} htmlFor={`imageUrl-${item.id}`}>
+                    Image URL
+                  </label>
+                  <input
+                    id={`imageUrl-${item.id}`}
+                    value={item.imageUrl}
+                    onChange={(e) => updateItem(item.id, { imageUrl: e.target.value })}
+                    className={fieldClass}
+                    placeholder="https://…"
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass} htmlFor={`imageAlt-${item.id}`}>
+                    Image alt text
+                  </label>
+                  <input
+                    id={`imageAlt-${item.id}`}
+                    value={item.imageAlt}
+                    onChange={(e) => updateItem(item.id, { imageAlt: e.target.value })}
+                    className={fieldClass}
+                    placeholder="Describe the image"
+                  />
+                </div>
               </div>
-              <div>
-                <label className={labelClass} htmlFor={`codeUrl-${item.id}`}>
-                  Code URL (optional)
-                </label>
-                <input
-                  id={`codeUrl-${item.id}`}
-                  type="url"
-                  value={item.codeUrl}
-                  onChange={(e) => updateItem(item.id, { codeUrl: e.target.value })}
-                  className={fieldClass}
-                  placeholder="https://github.com/…"
-                />
+
+              <div className="flex justify-center lg:sticky lg:top-4 lg:justify-end">
+                <div className="relative h-56 w-full max-w-[300px] shrink-0">
+                  {item.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={item.imageUrl}
+                      alt={item.imageAlt || item.title || ""}
+                      className="h-full w-full rounded-xl border border-border object-cover object-center bg-surface-container shadow-[0_12px_40px_rgb(0_0_0/0.35)]"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center rounded-xl border border-dashed border-border bg-surface-container/50">
+                      <span className="text-[12px] text-on-surface-variant/60">
+                        Frontend preview
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-
-            <div>
-              <label className={labelClass} htmlFor={`imageUrl-${item.id}`}>
-                Image URL
-              </label>
-              <input
-                id={`imageUrl-${item.id}`}
-                value={item.imageUrl}
-                onChange={(e) => updateItem(item.id, { imageUrl: e.target.value })}
-                className={fieldClass}
-                placeholder="https://…"
-              />
-            </div>
-
-            <div>
-              <label className={labelClass} htmlFor={`imageAlt-${item.id}`}>
-                Image alt text
-              </label>
-              <input
-                id={`imageAlt-${item.id}`}
-                value={item.imageAlt}
-                onChange={(e) => updateItem(item.id, { imageAlt: e.target.value })}
-                className={fieldClass}
-                placeholder="Describe the image"
-              />
-            </div>
-
-            {item.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={item.imageUrl}
-                alt={item.imageAlt || item.title || ""}
-                className="h-28 w-full rounded-lg object-cover bg-surface-container"
-              />
-            ) : null}
           </section>
         ))}
 

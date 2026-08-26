@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { forgotPasswordAction } from "@/app/dashboard-araf/actions";
+import DashboardAuthAtmosphere from "@/components/dashboard/DashboardAuthAtmosphere";
 
 const initialState = { error: null, success: false, message: null };
 
@@ -14,14 +15,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <main className="relative flex h-full min-h-0 items-center justify-center overflow-hidden px-4 py-10">
-      <div
-        className="pointer-events-none absolute inset-0"
-        aria-hidden
-        style={{
-          background:
-            "radial-gradient(ellipse 70% 55% at 50% -15%, rgb(173 198 255 / 0.18), transparent 55%), radial-gradient(ellipse 50% 40% at 90% 90%, rgb(78 222 163 / 0.08), transparent 50%)",
-        }}
-      />
+      <DashboardAuthAtmosphere />
 
       <div className="relative z-[1] w-full max-w-[420px]">
         <div className="mb-5">

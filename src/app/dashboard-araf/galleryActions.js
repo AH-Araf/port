@@ -42,9 +42,9 @@ export async function saveGalleryContentAction(prevState, formData) {
   }
 
   for (const item of normalized.items) {
-    if (!item.caption.trim()) {
+    if (!item.title.trim()) {
       return {
-        error: "Each gallery item needs a caption.",
+        error: "Each gallery item needs a title.",
         success: false,
         content: null,
       };

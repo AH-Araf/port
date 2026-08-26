@@ -38,7 +38,7 @@ export default function HeroSection({ content, onNavigateSection }) {
       <div
         className={
           showImage
-            ? "grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-4 items-center min-[501px]:items-start"
+            ? "grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-3 items-center min-[501px]:items-start"
             : "space-y-4"
         }
       >
@@ -92,12 +92,12 @@ export default function HeroSection({ content, onNavigateSection }) {
             ) : null}
 
             {showCtas ? (
-              <div className="flex flex-wrap gap-3 pt-2 justify-start">
+              <div className="flex flex-wrap gap-3 pt-1 justify-start">
                 {showPrimary ? (
                   <button
                     type="button"
                     onClick={() => onNavigateSection?.("#projects")}
-                    className="px-6 py-2 bg-primary text-on-primary font-semibold rounded-lg hover:brightness-110 transition-all shadow-lg shadow-primary/10 text-sm cursor-pointer"
+                    className="portfolio-btn border border-primary/30 px-6 py-2 bg-primary text-on-primary font-semibold text-sm"
                   >
                     {primaryCta}
                   </button>
@@ -108,7 +108,7 @@ export default function HeroSection({ content, onNavigateSection }) {
                       href={cvUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-6 py-2 bg-surface-container-low border border-border text-on-surface font-semibold rounded-lg hover:bg-surface-container-highest transition-all text-sm inline-flex items-center cursor-pointer"
+                      className="portfolio-btn portfolio-btn--ghost px-6 py-2 bg-surface-container-low border border-border text-on-surface font-semibold text-sm inline-flex items-center"
                     >
                       {secondaryCta}
                     </a>
@@ -117,7 +117,7 @@ export default function HeroSection({ content, onNavigateSection }) {
                       type="button"
                       disabled
                       title="CV not uploaded yet"
-                      className="px-6 py-2 bg-surface-container-low border border-border text-on-surface/40 font-semibold rounded-lg text-sm cursor-not-allowed"
+                      className="portfolio-btn portfolio-btn--ghost px-6 py-2 bg-surface-container-low border border-border text-on-surface/40 font-semibold text-sm"
                     >
                       {secondaryCta}
                     </button>

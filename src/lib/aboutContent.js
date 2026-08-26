@@ -9,6 +9,17 @@ export const DEFAULT_ABOUT_VISIBILITY = {
   secondaryCta: true,
   summary: true,
   interests: true,
+  map: true,
+};
+
+/** Default map zoom target (Dhaka) — matches /public/maps framing. */
+export const DEFAULT_ABOUT_LOCATION = {
+  city: "Dhaka",
+  country: "Bangladesh",
+  lat: 23.8103,
+  lng: 90.4125,
+  mapsUrl:
+    "https://www.google.com/maps/place/Dhaka/@23.8103,90.4125,11z",
 };
 
 /** Fallback when Supabase has no `about` row yet. */
@@ -26,6 +37,7 @@ export const DEFAULT_ABOUT_CONTENT = {
   imageUrl: "",
   summary: ABOUT.summary,
   interests: [...ABOUT.interests],
+  location: { ...DEFAULT_ABOUT_LOCATION },
   visibility: { ...DEFAULT_ABOUT_VISIBILITY },
 };
 
@@ -47,6 +59,61 @@ export function normalizeAboutVisibility(input) {
     secondaryCta: v.secondaryCta !== false,
     summary: v.summary !== false,
     interests: v.interests !== false,
+    map: v.map !== false,
+  };
+}
+
+/**
+ * Map lat/lng → CSS % on /public/maps/world-map.svg (viewBox 0 40 950 500).
+ * Calibrated so Dhaka (23.8103, 90.4125) lands on the known zoom point.
+ */
+export function latLngToLocPercent(lat, lng) {
+  const latN = Math.min(85, Math.max(-85, Number(lat)));
+  const lngN = Math.min(180, Math.max(-180, Number(lng)));
+  if (!Number.isFinite(latN) || !Number.isFinite(lngN)) {
+    return { x: 73.822, y: 44.228 };
+  }
+  const x = ((lngN + 180) / 360) * 100 - 1.29;
+  const y = ((90 - latN) / 180) * 100 + 7.456;
+  return {
+    x: Math.min(98, Math.max(2, x)),
+    y: Math.min(98, Math.max(2, y)),
+  };
+}
+
+export function normalizeAboutLocation(input) {
+  let raw = input;
+  if (typeof raw === "string") {
+    try {
+      raw = JSON.parse(raw);
+    } catch {
+      raw = {};
+    }
+  }
+  const v = raw && typeof raw === "object" ? raw : {};
+  const lat = Number(v.lat);
+  const lng = Number(v.lng);
+  const city = String(v.city ?? DEFAULT_ABOUT_LOCATION.city).trim() || DEFAULT_ABOUT_LOCATION.city;
+  const country =
+    String(v.country ?? DEFAULT_ABOUT_LOCATION.country).trim() ||
+    DEFAULT_ABOUT_LOCATION.country;
+  const safeLat = Number.isFinite(lat) ? lat : DEFAULT_ABOUT_LOCATION.lat;
+  const safeLng = Number.isFinite(lng) ? lng : DEFAULT_ABOUT_LOCATION.lng;
+  let mapsUrl = String(v.mapsUrl ?? "").trim();
+  if (!mapsUrl) {
+    mapsUrl = `https://www.google.com/maps/place/${encodeURIComponent(`${city}, ${country}`)}/@${safeLat},${safeLng},11z`;
+  }
+  const { x, y } = latLngToLocPercent(safeLat, safeLng);
+  const countryKey = country.toLowerCase();
+  return {
+    city,
+    country,
+    lat: safeLat,
+    lng: safeLng,
+    mapsUrl,
+    mapX: x,
+    mapY: y,
+    showCountryOutline: countryKey.includes("bangladesh"),
   };
 }
 
@@ -164,6 +231,14 @@ export function introHtmlToMarkup(html) {
 
 export function normalizeAboutContent(input) {
   const raw = input && typeof input === "object" ? input : {};
+  let locationRaw = raw.location;
+  if (typeof locationRaw === "string") {
+    try {
+      locationRaw = JSON.parse(locationRaw);
+    } catch {
+      locationRaw = {};
+    }
+  }
   const interests = Array.isArray(raw.interests)
     ? raw.interests.map((i) => String(i ?? "").trim()).filter(Boolean)
     : typeof raw.interests === "string"
@@ -176,6 +251,8 @@ export function normalizeAboutContent(input) {
   const intro = String(introFromLegacy(raw)).trim() || DEFAULT_ABOUT_CONTENT.intro;
   const cvUrl = String(raw.cvUrl ?? DEFAULT_ABOUT_CONTENT.cvUrl).trim();
   const imageUrl = String(raw.imageUrl ?? DEFAULT_ABOUT_CONTENT.imageUrl).trim();
+
+  const loc = normalizeAboutLocation(locationRaw);
 
   return {
     headlinePrefix: String(raw.headlinePrefix ?? DEFAULT_ABOUT_CONTENT.headlinePrefix),
@@ -190,6 +267,13 @@ export function normalizeAboutContent(input) {
     imageUrl,
     summary: String(raw.summary ?? DEFAULT_ABOUT_CONTENT.summary),
     interests: interests.length ? interests : [...DEFAULT_ABOUT_CONTENT.interests],
+    location: {
+      city: loc.city,
+      country: loc.country,
+      lat: loc.lat,
+      lng: loc.lng,
+      mapsUrl: loc.mapsUrl,
+    },
     visibility: normalizeAboutVisibility(raw.visibility),
   };
 }
@@ -208,6 +292,9 @@ export function aboutSearchLines(content) {
   if (vis.summary) lines.push(about.summary);
   if (vis.interests) {
     lines.push(...about.interests.map((i) => `interest: ${i}`));
+  }
+  if (vis.map && about.location) {
+    lines.push(`location: ${about.location.city}, ${about.location.country}`);
   }
   return lines;
 }

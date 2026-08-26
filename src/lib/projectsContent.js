@@ -31,7 +31,7 @@ function normalizeTags(raw) {
 
 /** Seed / fallback when Supabase has no projects row yet. */
 export const DEFAULT_PROJECTS_CONTENT = {
-  title: "Selected Projects",
+  title: "Projects",
   subtitle: "Tools and platforms engineered for scale.",
   items: [
     {
@@ -138,10 +138,14 @@ export function normalizeProjectsContent(input) {
   const titleRaw =
     !Array.isArray(raw) && raw && typeof raw === "object" ? raw.title : undefined;
 
+  let title =
+    String(titleRaw ?? DEFAULT_PROJECTS_CONTENT.title).trim() ||
+    DEFAULT_PROJECTS_CONTENT.title;
+  // Legacy default stored in Supabase before rename
+  if (title === "Selected Projects") title = DEFAULT_PROJECTS_CONTENT.title;
+
   return {
-    title:
-      String(titleRaw ?? DEFAULT_PROJECTS_CONTENT.title).trim() ||
-      DEFAULT_PROJECTS_CONTENT.title,
+    title,
     subtitle: String(
       !Array.isArray(raw) && raw && typeof raw === "object"
         ? (raw.subtitle ?? DEFAULT_PROJECTS_CONTENT.subtitle)

@@ -10,9 +10,11 @@ import {
 } from "@/app/dashboard-araf/aboutActions";
 import { ConfirmModal, StatusModal } from "@/components/dashboard/Modal";
 import {
+  DEFAULT_ABOUT_LOCATION,
   DEFAULT_ABOUT_VISIBILITY,
   introHtmlToMarkup,
   introMarkupToHtml,
+  normalizeAboutLocation,
   normalizeAboutVisibility,
   stripIntroMarkup,
 } from "@/lib/aboutContent";
@@ -20,6 +22,7 @@ import {
 const initialState = { error: null, success: false, message: null, content: null };
 
 function aboutSaveSnapshot(content, interestsText) {
+  const loc = normalizeAboutLocation(content?.location);
   return JSON.stringify({
     headlinePrefix: content?.headlinePrefix ?? "",
     headlineHighlight: content?.headlineHighlight ?? "",
@@ -29,6 +32,13 @@ function aboutSaveSnapshot(content, interestsText) {
     secondaryCta: content?.secondaryCta ?? "",
     summary: content?.summary ?? "",
     interests: interestsText ?? "",
+    location: {
+      city: loc.city,
+      country: loc.country,
+      lat: loc.lat,
+      lng: loc.lng,
+      mapsUrl: loc.mapsUrl,
+    },
     visibility: normalizeAboutVisibility(content?.visibility),
     cvUrl: content?.cvUrl ?? "",
     imageUrl: content?.imageUrl ?? "",
@@ -108,6 +118,9 @@ export default function AboutEditor({ initialContent }) {
   const [flash, setFlash] = useState(null);
   const [content, setContent] = useState(() => ({
     ...initialContent,
+    location: normalizeAboutLocation(
+      initialContent?.location ?? DEFAULT_ABOUT_LOCATION
+    ),
     visibility: normalizeAboutVisibility(
       initialContent?.visibility ?? DEFAULT_ABOUT_VISIBILITY
     ),
@@ -119,6 +132,9 @@ export default function AboutEditor({ initialContent }) {
     aboutSaveSnapshot(
       {
         ...initialContent,
+        location: normalizeAboutLocation(
+          initialContent?.location ?? DEFAULT_ABOUT_LOCATION
+        ),
         visibility: normalizeAboutVisibility(
           initialContent?.visibility ?? DEFAULT_ABOUT_VISIBILITY
         ),
@@ -137,6 +153,7 @@ export default function AboutEditor({ initialContent }) {
     if (state?.success && state.content) {
       const next = {
         ...state.content,
+        location: normalizeAboutLocation(state.content.location),
         visibility: normalizeAboutVisibility(state.content.visibility),
       };
       const nextInterests = (state.content.interests ?? []).join("\n");
@@ -210,6 +227,17 @@ export default function AboutEditor({ initialContent }) {
 
   const update = (key) => (e) => {
     setContent((prev) => ({ ...prev, [key]: e.target.value }));
+  };
+
+  const updateLocation = (key) => (e) => {
+    const value = e.target.value;
+    setContent((prev) => ({
+      ...prev,
+      location: normalizeAboutLocation({
+        ...normalizeAboutLocation(prev.location),
+        [key]: key === "lat" || key === "lng" ? value : value,
+      }),
+    }));
   };
 
   const setVisibility = (key, value) => {
@@ -311,6 +339,7 @@ export default function AboutEditor({ initialContent }) {
   };
 
   const visibility = normalizeAboutVisibility(content.visibility);
+  const location = normalizeAboutLocation(content.location);
   const introEmpty = !stripIntroMarkup(content.intro ?? "").trim();
   const hasCv = Boolean(content.cvUrl?.trim());
   const hasImage = Boolean(content.imageUrl?.trim());
@@ -323,6 +352,17 @@ export default function AboutEditor({ initialContent }) {
         <input type="hidden" name="cvUrl" value={content.cvUrl ?? ""} />
         <input type="hidden" name="imageUrl" value={content.imageUrl ?? ""} />
         <input type="hidden" name="visibility" value={JSON.stringify(visibility)} />
+        <input
+          type="hidden"
+          name="location"
+          value={JSON.stringify({
+            city: location.city,
+            country: location.country,
+            lat: location.lat,
+            lng: location.lng,
+            mapsUrl: location.mapsUrl,
+          })}
+        />
 
         <section className="rounded-xl bg-surface-container-lowest/90 p-4 space-y-4 sm:p-5">
           <div className="flex items-center gap-2 mb-1">
@@ -682,6 +722,89 @@ export default function AboutEditor({ initialContent }) {
                 onChange={(e) => setInterestsText(e.target.value)}
                 className={`${fieldClass} resize-y font-label-mono text-[12px]`}
                 placeholder={"Generative AI\nDistributed Systems"}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-3 rounded-lg bg-surface-container-low/80 p-4">
+            <SectionHeader
+              icon="location_on"
+              title="Map location"
+              visibilityKey="map"
+              visibility={visibility}
+              onToggle={setVisibility}
+            />
+            <p className="text-[12px] text-on-surface-variant leading-relaxed">
+              Drives the About map zoom animation (world → country → city). Bangladesh shows the
+              country outline; other countries use a pin.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label htmlFor="loc-city" className={labelClass}>
+                  City
+                </label>
+                <input
+                  id="loc-city"
+                  type="text"
+                  value={location.city}
+                  onChange={updateLocation("city")}
+                  className={fieldClass}
+                  placeholder="Dhaka"
+                />
+              </div>
+              <div>
+                <label htmlFor="loc-country" className={labelClass}>
+                  Country
+                </label>
+                <input
+                  id="loc-country"
+                  type="text"
+                  value={location.country}
+                  onChange={updateLocation("country")}
+                  className={fieldClass}
+                  placeholder="Bangladesh"
+                />
+              </div>
+              <div>
+                <label htmlFor="loc-lat" className={labelClass}>
+                  Latitude
+                </label>
+                <input
+                  id="loc-lat"
+                  type="number"
+                  step="any"
+                  value={location.lat}
+                  onChange={updateLocation("lat")}
+                  className={fieldClass}
+                  placeholder="23.8103"
+                />
+              </div>
+              <div>
+                <label htmlFor="loc-lng" className={labelClass}>
+                  Longitude
+                </label>
+                <input
+                  id="loc-lng"
+                  type="number"
+                  step="any"
+                  value={location.lng}
+                  onChange={updateLocation("lng")}
+                  className={fieldClass}
+                  placeholder="90.4125"
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="loc-maps" className={labelClass}>
+                Google Maps URL (optional)
+              </label>
+              <input
+                id="loc-maps"
+                type="url"
+                value={location.mapsUrl}
+                onChange={updateLocation("mapsUrl")}
+                className={fieldClass}
+                placeholder="https://www.google.com/maps/..."
               />
             </div>
           </div>

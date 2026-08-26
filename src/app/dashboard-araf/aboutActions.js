@@ -41,6 +41,7 @@ export async function saveAboutContentAction(prevState, formData) {
     imageUrl: formData.get("imageUrl"),
     summary: formData.get("summary"),
     interests: interestsRaw,
+    location: formData.get("location"),
     visibility: formData.get("visibility"),
   };
 
